@@ -3,6 +3,7 @@ package ph.asaboi.mergd;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -16,11 +17,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
+import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import ph.asaboi.mergd.classes.API;
+import ph.asaboi.mergd.classes.Meta;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -32,14 +38,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -91,11 +97,16 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_metas) {
             // Handle the camera action
-            new ApiTask(this).execute();
+            new ApiTask(this).execute("METAS");
 
         } else if (id == R.id.nav_gallery) {
-
+            new ApiTask(this).execute("ENTITIES",1);
         } else if (id == R.id.nav_slideshow) {
+            MetaFragment fragment = new MetaFragment();
+            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame,fragment);
+            fragmentTransaction.commit();
+
 
         } else if (id == R.id.nav_manage) {
 
@@ -121,7 +132,16 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected Object doInBackground(Object[] params) {
-            return SendAPI();
+            String param = (String)params[0];
+            switch (param)
+            {
+                case "METAS":
+                    return API.GetMetas();
+                case "ENTITIES":
+                    int metaID = (int)params[1];
+                    return  API.GetEntities(metaID);
+            }
+            return API.GetMetas();
         }
 
         @Override
@@ -131,25 +151,5 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-    public static String SendAPI() {
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("http://mergd.herokuapp.com/api/v1/metas/1")
-                .build();
-
-        Response response = null;
-        try {
-            response = client.newCall(request).execute();
-            String result = response.body().string();
-            return result;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return  "test";
-    }
 
 }

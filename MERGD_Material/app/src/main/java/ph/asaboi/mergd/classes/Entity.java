@@ -1,0 +1,25 @@
+package ph.asaboi.mergd.classes;
+
+import com.google.gson.annotations.SerializedName;
+
+/**
+ * Created by P004785 on 2/13/2016.
+ */
+public class Entity implements  Comparable<Entity> {
+    @SerializedName("entityid")
+    public int EntityID;
+    public String Name;
+    public String Description;
+
+    public Def[] Defs;
+    public String definition;
+    public int dorder;
+
+    public Entity[] LeftEntities;
+    public Entity[] RightEntities;
+
+    @Override
+    public int compareTo(Entity another) {
+        return this.Name.compareTo(another.Name);
+    }
+}
