@@ -1,6 +1,5 @@
 package ph.asaboi.mergd;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,22 +9,25 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.koushikdutta.ion.Ion;
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import ph.asaboi.mergd.R;
+import ph.asaboi.mergd.adapters.EntitiesHeaderAdapter;
 import ph.asaboi.mergd.adapters.EntityListAdapter;
 import ph.asaboi.mergd.classes.ApiTask;
 import ph.asaboi.mergd.classes.Callback;
-import ph.asaboi.mergd.classes.EntitiesManager;
 import ph.asaboi.mergd.classes.Entity;
+import ph.asaboi.mergd.classes.EntityItem;
 
 public class EntityDetailActivity extends AppCompatActivity {
 
@@ -35,6 +37,7 @@ public class EntityDetailActivity extends AppCompatActivity {
     private LinearLayoutManager mLayoutManager;
     private int entityid;
     private ProgressBar pBar;
+    private ImageView imgDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,9 @@ public class EntityDetailActivity extends AppCompatActivity {
 
         txtEntityName = (TextView) findViewById(R.id.txtEntityName);
         txtEntityDescription = (TextView) findViewById(R.id.txtEntityDescription);
+         imgDetail = (ImageView) findViewById(R.id.imgDetail);
+
+
         txtEntityName.setText(intent.getStringExtra("ENTITYNAME"));
         txtEntityDescription.setText("");
 
@@ -84,78 +90,10 @@ public class EntityDetailActivity extends AppCompatActivity {
             @Override
             public void onResult(Object result) {
                 Entity entity = (Entity) result;
-
+                Log.d("IMG",result.toString());
                 if(entity != null) {
-//                txtEntityName.setText(entity.Name);
-                    // Add to breadcrumbs
-//                    EntitiesManager.BreadCrumbs.add(new EntityListAdapter.EntityItem(entity.EntityID, entity.Name));
-                    txtEntityDescription.setText(entity.Description);
+                    LoadEntity2(entity);
 
-                    EntityListAdapter adapter = new EntityListAdapter(EntityDetailActivity.this);
-                    String groupName = "";
-                    ArrayList<EntityListAdapter.EntityItem> relItems = new ArrayList<EntityListAdapter.EntityItem>();
-                    for (Entity ent :
-                            entity.LeftEntities) {
-//                    if(!ent.definition.equals(groupName))
-//                    {
-//                        //Add group header
-////                        Log.d("APITASK",ent.definition);
-////                        Log.d("APITASK",groupName);
-//                        adapter.addGroup(ent.definition);
-//                        groupName = ent.definition;
-//                    }
-                        //adapter.addItem(0,new EntityListAdapter.EntityItem(ent));
-                        relItems.add(new EntityListAdapter.EntityItem(ent));
-                    }
-
-                    for (Entity ent :
-                            entity.RightEntities) {
-//                    if(!ent.definition.equals(groupName))
-//                    {
-//                        //Add group header
-////                        Log.d("APITASK",ent.definition);
-////                        Log.d("APITASK",groupName);
-//                        adapter.addGroup(ent.definition);
-//                        groupName = ent.definition;
-//                    }
-//                    //adapter.addItem(0,new EntityListAdapter.EntityItem(ent));
-                        relItems.add(new EntityListAdapter.EntityItem(ent));
-                    }
-
-                    // Sort
-                    Collections.sort(relItems, new Comparator<EntityListAdapter.EntityItem>() {
-                        @Override
-                        public int compare(EntityListAdapter.EntityItem lhs, EntityListAdapter.EntityItem rhs) {
-                            if (lhs.DOrder == rhs.DOrder) {
-                                if (lhs.Definition.equals(rhs.Definition)) {
-                                    return lhs.Name.compareTo(rhs.Name);
-                                } else {
-                                    return lhs.Definition.compareTo(rhs.Definition);
-                                }
-                            } else {
-                                return lhs.DOrder - rhs.DOrder;
-                            }
-                        }
-                    });
-
-                    for (EntityListAdapter.EntityItem ent :
-                            relItems) {
-                        if (!ent.Definition.equals(groupName)) {
-                            //Add group header
-//                        Log.d("APITASK",ent.definition);
-//                        Log.d("APITASK",groupName);
-                            adapter.addGroup(ent.Definition);
-                            groupName = ent.Definition;
-                        }
-                        adapter.addItem(0, ent);
-//                    relItems.add(new EntityListAdapter.EntityItem(ent));
-
-                    }
-
-                    lvRelationShips.setAdapter(adapter);
-
-
-                    //BreadCrumbs
 
                 }else
                 {
@@ -171,8 +109,161 @@ public class EntityDetailActivity extends AppCompatActivity {
                     textView.setTextColor(Color.YELLOW);
                     snackbar.show();
                 }
+
+
+                // Load Image
+                if(entity.imgurl != null && !entity.imgurl.isEmpty()) {
+                    imgDetail.setVisibility(View.VISIBLE);
+                    Ion.with(imgDetail)
+                            .placeholder(R.mipmap.ic_placeholder)
+                            .error(R.mipmap.ic_placeholder)
+                            .animateIn(R.animator.flipper)
+                            .load("http://mergd.herokuapp.com/imgs/" + entity.imgurl);
+                }else
+                {
+                    imgDetail.setVisibility( View.GONE);
+                }
+
                 pBar.setVisibility(View.GONE);
             }
         }).execute("ENTITY",entityid);
     }
+
+    private void LoadEntity(Entity entity) {
+        //                txtEntityName.setText(entity.Name);
+        // Add to breadcrumbs
+//                    EntitiesManager.BreadCrumbs.add(new EntityListAdapter.EntityItem(entity.EntityID, entity.Name));
+        txtEntityDescription.setText(entity.Description);
+
+        EntityListAdapter adapter = new EntityListAdapter(EntityDetailActivity.this);
+        String groupName = "";
+        ArrayList<EntityItem> relItems = new ArrayList<EntityItem>();
+        for (Entity ent :
+                entity.LeftEntities) {
+//                    if(!ent.definition.equals(groupName))
+//                    {
+//                        //Add group header
+////                        Log.d("APITASK",ent.definition);
+////                        Log.d("APITASK",groupName);
+//                        adapter.addGroup(ent.definition);
+//                        groupName = ent.definition;
+//                    }
+            //adapter.addItem(0,new EntityListAdapter.EntityItem(ent));
+            relItems.add(new EntityItem(ent));
+        }
+
+        for (Entity ent :
+                entity.RightEntities) {
+//                    if(!ent.definition.equals(groupName))
+//                    {
+//                        //Add group header
+////                        Log.d("APITASK",ent.definition);
+////                        Log.d("APITASK",groupName);
+//                        adapter.addGroup(ent.definition);
+//                        groupName = ent.definition;
+//                    }
+//                    //adapter.addItem(0,new EntityListAdapter.EntityItem(ent));
+            relItems.add(new EntityItem(ent));
+        }
+
+        // Sort
+        Collections.sort(relItems, new Comparator<EntityItem>() {
+            @Override
+            public int compare(EntityItem lhs, EntityItem rhs) {
+                if (lhs.DOrder == rhs.DOrder) {
+                    if (lhs.Definition.equals(rhs.Definition)) {
+                        return lhs.Name.compareTo(rhs.Name);
+                    } else {
+                        return lhs.Definition.compareTo(rhs.Definition);
+                    }
+                } else {
+                    return lhs.DOrder - rhs.DOrder;
+                }
+            }
+        });
+
+        for (EntityItem ent :
+                relItems) {
+            if (!ent.Definition.equals(groupName)) {
+                //Add group header
+//                        Log.d("APITASK",ent.definition);
+//                        Log.d("APITASK",groupName);
+                adapter.addGroup(ent.Definition);
+                groupName = ent.Definition;
+            }
+            adapter.addItem(0, ent);
+//                    relItems.add(new EntityListAdapter.EntityItem(ent));
+
+        }
+
+        lvRelationShips.setAdapter(adapter);
+
+
+        //BreadCrumbs
+    }
+
+    private void LoadEntity2(Entity entity)
+    {
+
+        txtEntityDescription.setText(entity.Description);
+
+//        EntityListAdapter adapter = new EntityListAdapter(EntityDetailActivity.this);
+        String groupName = "";
+        ArrayList<EntityItem> relItems = new ArrayList<EntityItem>();
+        for (Entity ent :
+                entity.LeftEntities) {
+            relItems.add(new EntityItem(ent));
+        }
+
+        for (Entity ent :
+                entity.RightEntities) {
+            EntityItem entityItem = new EntityItem(ent);
+            entityItem.defid += 1000; // Add offset for right Entities
+            relItems.add(entityItem);
+        }
+
+        // Sort
+        Collections.sort(relItems, new Comparator<EntityItem>() {
+            @Override
+            public int compare(EntityItem lhs, EntityItem rhs) {
+                if (lhs.DOrder == rhs.DOrder) {
+                    if (lhs.Definition.equals(rhs.Definition)) {
+                        return lhs.Name.compareTo(rhs.Name);
+                    } else {
+                        return lhs.Definition.compareTo(rhs.Definition);
+                    }
+                } else {
+                    return lhs.DOrder - rhs.DOrder;
+                }
+            }
+        });
+
+//        for (EntityListAdapter.EntityItem ent :
+//                relItems) {
+//            if (!ent.Definition.equals(groupName)) {
+//                adapter.addGroup(ent.Definition);
+//                groupName = ent.Definition;
+//            }
+//            adapter.addItem(0, ent);
+//        }
+
+
+        EntitiesHeaderAdapter adapter = new EntitiesHeaderAdapter(this);
+        adapter.addAll(relItems);
+        lvRelationShips.setAdapter(adapter);
+
+        final StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(adapter);
+
+        lvRelationShips.addItemDecoration(headersDecor );
+
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                headersDecor.invalidateHeaders();
+            }
+        });
+
+    }
+
+
 }

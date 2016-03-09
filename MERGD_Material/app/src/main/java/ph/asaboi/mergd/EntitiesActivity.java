@@ -1,6 +1,5 @@
 package ph.asaboi.mergd;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,13 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -27,12 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import ph.asaboi.mergd.adapters.EntityListAdapter;
-import ph.asaboi.mergd.adapters.MetaListAdapter;
 import ph.asaboi.mergd.classes.ApiTask;
 import ph.asaboi.mergd.classes.Callback;
 import ph.asaboi.mergd.classes.EntitiesManager;
 import ph.asaboi.mergd.classes.Entity;
-import ph.asaboi.mergd.classes.Meta;
+import ph.asaboi.mergd.classes.EntityItem;
 
 public class EntitiesActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -139,20 +134,20 @@ public class EntitiesActivity extends AppCompatActivity implements SearchView.On
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        final List<EntityListAdapter.EntityItem> filteredModelList = filter(EntitiesManager.Entities, newText);
+        final List<EntityItem> filteredModelList = filter(EntitiesManager.Entities, newText);
         mAdapter.animateTo(filteredModelList);
         mRecyclerView.scrollToPosition(0);
         return true;
     }
 
-    private List<EntityListAdapter.EntityItem> filter(List<Entity> models, String query) {
+    private List<EntityItem> filter(List<Entity> models, String query) {
         query = query.toLowerCase();
 
-        final List<EntityListAdapter.EntityItem> filteredModelList = new ArrayList<>();
+        final List<EntityItem> filteredModelList = new ArrayList<>();
         for (Entity model : models) {
             final String text = model.Name.toLowerCase();
             if (text.contains(query)) {
-                filteredModelList.add(new EntityListAdapter.EntityItem(model));
+                filteredModelList.add(new EntityItem(model));
             }
         }
         return filteredModelList;

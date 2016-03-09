@@ -7,25 +7,22 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import ph.asaboi.mergd.EntitiesActivity;
 import ph.asaboi.mergd.EntityDetailActivity;
 import ph.asaboi.mergd.R;
 import ph.asaboi.mergd.classes.Entity;
-import ph.asaboi.mergd.classes.Meta;
+import ph.asaboi.mergd.classes.EntityItem;
 
 /**
  * Created by P004785 on 2/14/2016.
@@ -35,13 +32,14 @@ public class EntityListAdapter extends RecyclerView.Adapter<EntityListAdapter.En
     private final ArrayList<EntityItem> mDataset;
     private final Context mContext;
 
-    private static final int TYPE_ITEM = 0;
-    private static final int TYPE_GROUP = 1;
+    public static final int TYPE_ITEM = 0;
+    public static final int TYPE_GROUP = 1;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     public static class EntityViewHolder extends RecyclerView.ViewHolder {
+        public ImageView imgListItem;
         // each data item is just a string in this case
         public TextView txtMetaName;
         public TextView txtMetaDesc;
@@ -52,53 +50,10 @@ public class EntityListAdapter extends RecyclerView.Adapter<EntityListAdapter.En
             txtMetaName = (TextView) v.findViewById(R.id.txtMetaName);
             txtMetaDesc = (TextView) v.findViewById(R.id.txtMetaDesc);
             metaListItem = (LinearLayout) v.findViewById(R.id.metaListItem);
+            imgListItem = (ImageView) v.findViewById(R.id.imgListItem);
         }
     }
 
-    public static class EntityItem
-    {
-        public String Definition;
-        public int DOrder;
-        public int EntityID;
-        public String Name;
-        public String Description;
-
-        public int ItemType;
-
-        public EntityItem(Entity entity) {
-            this.Name = entity.Name;
-            this.Description = entity.Description;
-            this.EntityID = entity.EntityID;
-
-            this.DOrder = entity.dorder;
-            this.Definition = entity.definition;
-            this.ItemType = TYPE_ITEM;
-        }
-
-        public EntityItem(String name) {
-            this.Name = name;
-            this.ItemType = TYPE_GROUP;
-        }
-
-        public EntityItem(int entityID, String name) {
-            this.EntityID = entityID;
-            this.Name    = name;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.EntityID;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if(o instanceof EntityItem){
-                EntityItem toCompare = (EntityItem) o;
-                return this.EntityID == toCompare.EntityID;
-            }
-            return false;
-        }
-    }
     @Override
     public EntityViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
        // set the view's size, margins, paddings and layout parameters
@@ -108,7 +63,7 @@ public class EntityListAdapter extends RecyclerView.Adapter<EntityListAdapter.En
             case TYPE_ITEM:
                 // create a new view
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.meta_listitem, parent, false);
+                        .inflate(R.layout.entity_listitem, parent, false);
 
                 EntityViewHolder vh = new EntityViewHolder(v);
 //                Log.d("ENTITY","TYP:ITM");
@@ -137,6 +92,18 @@ public class EntityListAdapter extends RecyclerView.Adapter<EntityListAdapter.En
 
             holder.metaListItem.setOnClickListener(clickListener);
             holder.metaListItem.setTag(holder);
+            // Load Image
+            if(entity.ImgUrl != null && !entity.ImgUrl.isEmpty()) {
+                holder.imgListItem.setVisibility(View.VISIBLE);
+                Ion.with(holder.imgListItem)
+                        .placeholder(R.mipmap.ic_placeholder)
+                        .error(R.mipmap.ic_placeholder)
+                        .animateIn(R.animator.flipper)
+                        .load("http://mergd.herokuapp.com/imgs/" + entity.ImgUrl);
+            }else
+            {
+                holder.imgListItem.setVisibility( View.GONE);
+            }
         }
     }
 

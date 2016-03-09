@@ -11,12 +11,15 @@ public class Entity implements  Comparable<Entity> {
     public String Name;
     public String Description;
 
+
     public Def[] Defs;
+    public int defid;
     public String definition;
     public int dorder;
 
     public Entity[] LeftEntities;
     public Entity[] RightEntities;
+    public String imgurl;
 
     @Override
     public int compareTo(Entity another) {

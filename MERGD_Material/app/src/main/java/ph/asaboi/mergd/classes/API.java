@@ -60,7 +60,7 @@ public class API {
         Gson gson = new Gson();
         String json = SendAPI("http://mergd.herokuapp.com/api/v1/entities/" + entID);
         String results = "";
-//        Log.d("APITASK",json);
+       // Log.d("APITASK",json);
         Entity entity = gson.fromJson(json, Entity.class);
         return entity;
     }
