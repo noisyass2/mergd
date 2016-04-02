@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_rate"
+        android:title="Rate"
+        app:showAsAction="withText|ifRoom"
+        android:icon="@drawable/ic_action_star"  />
+    <item android:id="@+id/action_buy"
+        android:title="Remove Ads"
+        app:showAsAction="withText|ifRoom"
+        android:icon="@drawable/ic_action_unlock"
+        android:visible="false"/>
+</menu>

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">"MERGD "</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="transition_name_name">transition:NAME</string>
+    <string name="banner_ad_unit_id_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="banner_ad_unit_id">ca-app-pub-7149749172108949/7396459175</string>
+    <string name="banner_ad_unit_id_metas">ca-app-pub-7149749172108949/5780125179</string>
+    <string name="banner_ad_unit_id_entities">ca-app-pub-7149749172108949/7256858379</string>
+    <string name="banner_ad_unit_id_details">ca-app-pub-7149749172108949/8733591579</string>
+</resources>
